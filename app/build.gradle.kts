@@ -65,6 +65,10 @@ dependencies {
     // M3
     implementation(libs.androidx.material3)
 
+    // Koin
+    implementation(project.dependencies.platform(libs.koin.bom))
+    implementation(libs.koin.core)
+
     // Unit testing
     testImplementation(libs.junit)
 
