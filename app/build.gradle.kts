@@ -70,6 +70,14 @@ dependencies {
     implementation(libs.koin.core)
     implementation(libs.koin.android)
 
+    // Camera
+    implementation(libs.camerak)
+
+    // Permissions
+    implementation(libs.accompanist.permissions)
+
+    implementation(libs.barcode.scanning)
+
     // Unit testing
     testImplementation(libs.junit)
 
