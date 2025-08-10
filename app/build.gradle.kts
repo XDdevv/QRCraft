@@ -80,6 +80,8 @@ dependencies {
 
     implementation(libs.barcode.scanning)
 
+    implementation(libs.androidx.core.splashscreen)
+
     // Unit testing
     testImplementation(libs.junit)
 
