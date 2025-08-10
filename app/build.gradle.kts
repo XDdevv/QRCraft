@@ -73,6 +73,8 @@ dependencies {
     // Camera
     implementation(libs.camerak)
 
+    implementation(libs.qr.scanner.plugin)
+
     // Permissions
     implementation(libs.accompanist.permissions)
 
