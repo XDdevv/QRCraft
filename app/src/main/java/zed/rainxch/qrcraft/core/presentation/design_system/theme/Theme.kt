@@ -10,8 +10,10 @@ private val LightColorScheme = lightColorScheme(
     surfaceContainerHighest = surfaceHigher,
     onSurface = onSurface,
     onSurfaceVariant = onSurfaceAlt,
+    inverseOnSurface = onSurfaceDisabled,
     tertiary = overlay,
-    onTertiary = onOverlay
+    onTertiary = onOverlay,
+    error = error
 )
 
 @Composable
