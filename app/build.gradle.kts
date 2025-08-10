@@ -68,6 +68,7 @@ dependencies {
     // Koin
     implementation(project.dependencies.platform(libs.koin.bom))
     implementation(libs.koin.core)
+    implementation(libs.koin.android)
 
     // Unit testing
     testImplementation(libs.junit)
