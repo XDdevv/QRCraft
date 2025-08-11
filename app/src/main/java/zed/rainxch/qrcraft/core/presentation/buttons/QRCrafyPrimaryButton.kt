@@ -11,6 +11,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -22,14 +25,19 @@ fun QRCraftPrimaryButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    containerColor: Color = MaterialTheme.colorScheme.surfaceContainerHighest,
     enabled: Boolean = true,
+    isErrorButton: Boolean = false,
+    icon: ImageVector? = null,
 ) {
     Button(
         onClick = onClick,
         enabled = enabled,
         colors = ButtonColors(
-            containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.onSurface,
+            containerColor = containerColor,
+            contentColor = if (isErrorButton) {
+                MaterialTheme.colorScheme.error
+            } else MaterialTheme.colorScheme.onSurface,
             disabledContainerColor = MaterialTheme.colorScheme.surface,
             disabledContentColor = MaterialTheme.colorScheme.inverseOnSurface,
         ),
@@ -43,20 +51,19 @@ fun QRCraftPrimaryButton(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Icon(
-                imageVector = QRCraftIcons.Default.scan,
-                contentDescription = null
-            )
+            icon?.let { icon ->
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null
+                )
+            }
 
             Text(
                 text = text,
                 style = MaterialTheme.typography.labelLarge,
-                fontSize = 16.sp
-            )
-
-            Icon(
-                imageVector = QRCraftIcons.Default.scan,
-                contentDescription = null
+                fontSize = 16.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
             )
         }
     }

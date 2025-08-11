@@ -11,10 +11,11 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import zed.rainxch.qrcraft.core.presentation.design_system.theme.QRCraftIcons
 import zed.rainxch.qrcraft.core.presentation.design_system.theme.QRCraftTheme
 
 @Composable
@@ -23,6 +24,7 @@ fun QRCraftTextButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    icon: ImageVector? = null,
     isErrorButton: Boolean = false,
 ) {
     TextButton(
@@ -44,20 +46,19 @@ fun QRCraftTextButton(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Icon(
-                imageVector = QRCraftIcons.Default.scan,
-                contentDescription = null
-            )
+            icon?.let { icon ->
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null
+                )
+            }
 
             Text(
                 text = text,
                 style = MaterialTheme.typography.labelLarge,
-                fontSize = 16.sp
-            )
-
-            Icon(
-                imageVector = QRCraftIcons.Default.scan,
-                contentDescription = null
+                fontSize = 16.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
             )
         }
     }
