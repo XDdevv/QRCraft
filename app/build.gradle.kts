@@ -75,6 +75,7 @@ dependencies {
 
     implementation(libs.qr.scanner.plugin)
 
+    implementation(libs.androidx.navigation.compose)
     // Permissions
     implementation(libs.accompanist.permissions)
 
