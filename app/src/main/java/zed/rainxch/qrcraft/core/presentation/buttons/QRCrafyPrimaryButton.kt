@@ -3,6 +3,7 @@ package zed.rainxch.qrcraft.core.presentation.buttons
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Icon
@@ -54,14 +55,14 @@ fun QRCraftPrimaryButton(
             icon?.let { icon ->
                 Icon(
                     imageVector = icon,
-                    contentDescription = null
+                    contentDescription = null,
+                    modifier = Modifier.size(16.dp)
                 )
             }
 
             Text(
                 text = text,
                 style = MaterialTheme.typography.labelLarge,
-                fontSize = 16.sp,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
