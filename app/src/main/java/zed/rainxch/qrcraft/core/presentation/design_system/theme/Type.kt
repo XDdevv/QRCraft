@@ -38,6 +38,6 @@ val Typography = Typography(
         fontFamily = suse_font,
         fontWeight = FontWeight.Normal,
         lineHeight = 1.1.em,
-        fontSize = 20.sp
+        fontSize = 16.sp
     ),
 )
