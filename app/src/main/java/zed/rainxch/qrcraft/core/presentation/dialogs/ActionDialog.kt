@@ -18,6 +18,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -25,24 +27,24 @@ import androidx.compose.ui.window.DialogProperties
 import zed.rainxch.qrcraft.core.presentation.buttons.QRCraftPrimaryButton
 import zed.rainxch.qrcraft.core.presentation.design_system.theme.QRCraftTheme
 
-data class PermissionDialogAction(
+data class ActionDialogAction(
     val title: String,
     val action: () -> Unit,
-    val type: PermissionDialogActionType,
+    val type: ActionDialogActionType,
 )
 
-enum class PermissionDialogActionType {
+enum class ActionDialogActionType {
     POSITIVE,
     NEGATIVE
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PermissionDialog(
+fun ActionDialog(
     title: String,
     description: String,
     onDismissRequest: () -> Unit,
-    actions: List<PermissionDialogAction>,
+    actions: List<ActionDialogAction>,
     modifier: Modifier = Modifier,
 ) {
     BasicAlertDialog(
@@ -57,6 +59,9 @@ fun PermissionDialog(
             .clip(RoundedCornerShape(12.dp))
             .background(MaterialTheme.colorScheme.surface)
             .padding(horizontal = 24.dp, vertical = 28.dp)
+            .semantics {
+                contentDescription = "$title. $description"
+            }
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
@@ -86,8 +91,10 @@ fun PermissionDialog(
                     QRCraftPrimaryButton(
                         text = action.title,
                         onClick = action.action,
-                        isErrorButton = action.type == PermissionDialogActionType.NEGATIVE,
-                        modifier = Modifier.weight(1f)
+                        isErrorButton = action.type == ActionDialogActionType.NEGATIVE,
+                        modifier = Modifier
+                            .weight(1f)
+                            .semantics { contentDescription = action.title }
                     )
                 }
             }
@@ -99,24 +106,24 @@ fun PermissionDialog(
 @Composable
 private fun PermissionDialogPreview() {
     QRCraftTheme {
-        PermissionDialog(
+        ActionDialog(
             "Camera Required",
             "This app cannot function without camera access. To scan QR codes, please grant permission.",
             {},
             listOf(
-                PermissionDialogAction(
+                ActionDialogAction(
                     title = "Close App",
                     action = {
 
                     },
-                    type = PermissionDialogActionType.NEGATIVE
+                    type = ActionDialogActionType.NEGATIVE
                 ),
-                PermissionDialogAction(
+                ActionDialogAction(
                     title = "Grant Access",
                     action = {
 
                     },
-                    type = PermissionDialogActionType.POSITIVE
+                    type = ActionDialogActionType.POSITIVE
                 )
             )
         )
