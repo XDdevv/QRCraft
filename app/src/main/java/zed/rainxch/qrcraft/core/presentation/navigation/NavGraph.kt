@@ -10,6 +10,6 @@ sealed interface NavGraph {
 
     @Serializable
     data class ScanResultScreen(
-        val qrResult: QRResult
-    ): NavGraph
+        val qrResult: QRResult,
+    ) : NavGraph
 }

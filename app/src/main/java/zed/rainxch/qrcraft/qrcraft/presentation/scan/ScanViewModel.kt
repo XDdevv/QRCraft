@@ -4,17 +4,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import zed.rainxch.qrcraft.core.domain.model.QRResult
 import zed.rainxch.qrcraft.core.presentation.snackbar.SnackbarController
 import zed.rainxch.qrcraft.core.presentation.snackbar.SnackbarEvent
+import zed.rainxch.qrcraft.qrcraft.domain.repository.QRScannerRepository
 
-class ScanViewModel : ViewModel() {
+class ScanViewModel(
+    private val qrRepository: QRScannerRepository,
+) : ViewModel() {
 
     private val _state = MutableStateFlow(ScanState())
     val state = _state.asStateFlow()
@@ -24,10 +25,6 @@ class ScanViewModel : ViewModel() {
 
     fun onAction(action: ScanAction) {
         when (action) {
-            is ScanAction.OnQRDetected -> {
-
-            }
-
             ScanAction.OnDeclinePermissions -> {
                 viewModelScope.launch {
                     _events.send(ScanEvents.OnCloseAppClick)
@@ -35,10 +32,12 @@ class ScanViewModel : ViewModel() {
             }
 
             ScanAction.OnGrantPermissions -> {
-                _state.update { it.copy(
-                    showPermissionDialog = false,
-                    showSystemPermissionDialog = false
-                ) }
+                _state.update {
+                    it.copy(
+                        showPermissionDialog = false,
+                        showSystemPermissionDialog = false
+                    )
+                }
 
                 viewModelScope.launch {
                     SnackbarController.sendEvent(
@@ -60,6 +59,29 @@ class ScanViewModel : ViewModel() {
             ScanAction.OnOpenPermissionSettings -> {
                 viewModelScope.launch {
                     _events.send(ScanEvents.OnOpenPermissionSettings)
+                }
+            }
+
+            is ScanAction.StartScanning -> {
+                viewModelScope.launch {
+                    qrRepository.startScanning(
+                        action.lifecycleOwner,
+                        action.surfaceProvider
+                    )
+                        .collect { qrResult ->
+                            onAction(
+                                ScanAction.OnQrDetected(
+                                    qrResult?.value,
+                                    qrResult?.type
+                                )
+                            )
+                        }
+                }
+            }
+
+            is ScanAction.OnQrDetected -> {
+                _state.update {
+                    it.copy(scannedQr = QRResult(action?.value, action?.type))
                 }
             }
         }

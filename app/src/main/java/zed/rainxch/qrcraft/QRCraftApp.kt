@@ -16,7 +16,7 @@ class QRCraftApp : Application() {
         )
 
         startKoin {
-            androidLogger(level = Level.INFO)
+            androidLogger(level = Level.ERROR)
             androidContext(this@QRCraftApp)
             modules(modules)
         }

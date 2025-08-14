@@ -14,8 +14,8 @@ class ScanResultViewModel : ViewModel() {
         when (action) {
             is ScanResultAction.OnLoadData -> {
                 _state.update { it.copy(
-                    type = action.data.type,
-                    data = action.data.value
+                    type = action.data.type!!,
+                    data = action.data.value!!
                 ) }
             }
 

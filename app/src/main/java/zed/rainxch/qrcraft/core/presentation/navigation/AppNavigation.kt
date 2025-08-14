@@ -14,11 +14,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import kotlinx.coroutines.launch
+import kotlinx.serialization.serializer
+import zed.rainxch.qrcraft.core.domain.model.QRResult
 import zed.rainxch.qrcraft.core.presentation.snackbar.SnackbarController
 import zed.rainxch.qrcraft.core.presentation.utils.ObserveAsEvents
 import zed.rainxch.qrcraft.qrcraft.presentation.scan.ScanRoot
 import zed.rainxch.qrcraft.qrcraft.presentation.scan.components.PermissionSnackbar
 import zed.rainxch.qrcraft.qrcraft.presentation.scan_result.ScanResultRoot
+import kotlin.reflect.typeOf
 
 @Composable
 fun AppNavigation(
@@ -64,7 +67,11 @@ fun AppNavigation(
                 ScanRoot()
             }
 
-            composable<NavGraph.ScanScreen> { backStackEntry ->
+            composable<NavGraph.ScanResultScreen> (
+                typeMap = mapOf(
+                    typeOf<QRResult>() to SerializableNavType.create(serializer<QRResult>())
+                )
+            ) { backStackEntry ->
                 val args = backStackEntry.toRoute<NavGraph.ScanResultScreen>()
                 ScanResultRoot(
                     result = args.qrResult

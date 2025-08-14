@@ -1,5 +1,8 @@
 package zed.rainxch.qrcraft.core.domain.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 enum class QRResultType(val title: String) {
     TEXT(title = "Text"),
     LINK(title = "Link"),
