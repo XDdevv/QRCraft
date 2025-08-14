@@ -13,7 +13,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -23,12 +25,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -36,15 +38,18 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import org.koin.androidx.compose.koinViewModel
 import zed.rainxch.qrcraft.R
+import zed.rainxch.qrcraft.core.domain.model.QRResult
 import zed.rainxch.qrcraft.core.presentation.dialogs.ActionDialog
 import zed.rainxch.qrcraft.core.presentation.dialogs.ActionDialogAction
 import zed.rainxch.qrcraft.core.presentation.dialogs.ActionDialogActionType
+import zed.rainxch.qrcraft.core.presentation.navigation.NavGraph
 import zed.rainxch.qrcraft.core.presentation.utils.ObserveAsEvents
 import zed.rainxch.qrcraft.qrcraft.presentation.scan.utils.openSettings
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun ScanRoot(
+    onNavigateToResult: (QRResult) -> Unit,
     viewModel: ScanViewModel = koinViewModel(),
 ) {
     val activity = LocalActivity.current
@@ -60,6 +65,10 @@ fun ScanRoot(
 
             ScanEvents.OnOpenPermissionSettings -> {
                 openSettings(context)
+            }
+
+            is ScanEvents.OnQrDetected -> {
+                onNavigateToResult(event.qrResult)
             }
         }
     }
@@ -84,6 +93,8 @@ fun ScanRoot(
     LaunchedEffect(Unit) {
         if (!permission.status.isGranted) {
             viewModel.onAction(ScanAction.OnShowPermissionDialog)
+        } else {
+            viewModel.onAction(ScanAction.OnPermissionsGranted)
         }
     }
 
@@ -131,15 +142,17 @@ fun ScanScreen(
 
     val previewView = remember { PreviewView(context) }
 
-    LaunchedEffect(Unit) {
-        // Start scanning
-        onAction(
-            ScanAction.StartScanning(
-                lifecycleOwner = lifecycleOwner,
-                surfaceProvider = previewView.surfaceProvider
+    LaunchedEffect(state.hasCameraPermission) {
+        if (state.hasCameraPermission) {
+            onAction(
+                ScanAction.StartScanning(
+                    lifecycleOwner = lifecycleOwner,
+                    surfaceProvider = previewView.surfaceProvider
+                )
             )
-        )
+        }
     }
+
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -153,8 +166,32 @@ fun ScanScreen(
         )
 
         CameraContent()
+
+        Loading(state.isLoading)
     }
 
+}
+
+@Composable
+fun Loading(isLoading: Boolean) {
+    if (isLoading) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            CircularProgressIndicator(
+                color = MaterialTheme.colorScheme.onTertiary,
+                strokeWidth = 4.dp,
+                strokeCap = StrokeCap.Round
+            )
+
+            Text(
+                text = stringResource(R.string.loading),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onTertiary
+            )
+        }
+    }
 }
 
 @Composable

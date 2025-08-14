@@ -7,6 +7,7 @@ import zed.rainxch.qrcraft.core.domain.model.QRResultType
 sealed interface ScanAction {
     data object OnDeclinePermissions : ScanAction
     data object OnGrantPermissions : ScanAction
+    data object OnPermissionsGranted : ScanAction
     data object OnShowPermissionDialog : ScanAction
     data object OnRequestSystemPermissionDialog : ScanAction
     data object OnOpenPermissionSettings : ScanAction

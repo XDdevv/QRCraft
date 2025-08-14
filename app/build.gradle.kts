@@ -77,6 +77,9 @@ dependencies {
 
     implementation(libs.qr.scanner.plugin)
 
+    implementation(libs.core)
+    implementation(libs.zxing.android.embedded)
+
     implementation(libs.androidx.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
 

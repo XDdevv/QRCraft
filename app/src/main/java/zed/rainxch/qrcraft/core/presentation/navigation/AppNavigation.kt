@@ -64,7 +64,11 @@ fun AppNavigation(
             startDestination = NavGraph.ScanScreen
         ) {
             composable<NavGraph.ScanScreen> {
-                ScanRoot()
+                ScanRoot(
+                    onNavigateToResult = { qRResult ->
+                        navController.navigate(NavGraph.ScanResultScreen(qRResult))
+                    }
+                )
             }
 
             composable<NavGraph.ScanResultScreen> (

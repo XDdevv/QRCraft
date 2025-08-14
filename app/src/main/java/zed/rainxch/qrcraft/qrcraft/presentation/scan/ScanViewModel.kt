@@ -3,8 +3,11 @@ package zed.rainxch.qrcraft.qrcraft.presentation.scan
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -34,6 +37,7 @@ class ScanViewModel(
             ScanAction.OnGrantPermissions -> {
                 _state.update {
                     it.copy(
+                        hasCameraPermission = true,
                         showPermissionDialog = false,
                         showSystemPermissionDialog = false
                     )
@@ -44,6 +48,14 @@ class ScanViewModel(
                         SnackbarEvent(
                             message = "Camera permission granted"
                         )
+                    )
+                }
+            }
+
+            ScanAction.OnPermissionsGranted -> {
+                _state.update {
+                    it.copy(
+                        hasCameraPermission = true,
                     )
                 }
             }
@@ -65,9 +77,11 @@ class ScanViewModel(
             is ScanAction.StartScanning -> {
                 viewModelScope.launch {
                     qrRepository.startScanning(
-                        action.lifecycleOwner,
-                        action.surfaceProvider
+                        lifecycleOwner = action.lifecycleOwner,
+                        surfaceProvider = action.surfaceProvider
                     )
+                        .distinctUntilChanged()
+                        .onEach { delay(1000) }
                         .collect { qrResult ->
                             onAction(
                                 ScanAction.OnQrDetected(
@@ -81,7 +95,30 @@ class ScanViewModel(
 
             is ScanAction.OnQrDetected -> {
                 _state.update {
-                    it.copy(scannedQr = QRResult(action?.value, action?.type))
+                    it.copy(
+                        isLoading = action.value != null,
+                        scannedQr = QRResult(action.value, action.type)
+                    )
+                }
+
+                if (_state.value.scannedQr?.value != null && _state.value.scannedQr?.type != null) {
+                    viewModelScope.launch {
+                        _events.send(
+                            ScanEvents.OnQrDetected(
+                                QRResult(
+                                    _state.value.scannedQr?.value,
+                                    _state.value.scannedQr?.type
+                                )
+                            )
+                        )
+
+                        _state.update {
+                            it.copy(
+                                isLoading = false,
+                                scannedQr = null
+                            )
+                        }
+                    }
                 }
             }
         }

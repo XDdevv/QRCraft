@@ -1,5 +1,6 @@
 package zed.rainxch.qrcraft.qrcraft.presentation.scan_result
 
+import android.graphics.Bitmap
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -28,24 +29,28 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import org.koin.androidx.compose.koinViewModel
 import zed.rainxch.qrcraft.R
 import zed.rainxch.qrcraft.core.domain.model.QRResult
 import zed.rainxch.qrcraft.core.domain.model.QRResultType
 import zed.rainxch.qrcraft.core.presentation.buttons.QRCraftPrimaryButton
 import zed.rainxch.qrcraft.core.presentation.design_system.theme.QRCraftIcons
 import zed.rainxch.qrcraft.core.presentation.design_system.theme.QRCraftTheme
+import zed.rainxch.qrcraft.core.presentation.texts.QRCraftCollapsableText
 import zed.rainxch.qrcraft.core.presentation.texts.QRCraftTextLink
+import zed.rainxch.qrcraft.qrcraft.presentation.scan_result.utils.generateQRCode
 
 @Composable
 fun ScanResultRoot(
     result: QRResult,
-    viewModel: ScanResultViewModel = viewModel(),
+    viewModel: ScanResultViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
 
@@ -129,11 +134,8 @@ fun CardContent(
                 link = state.data
             )
         } else {
-            Text(
+            QRCraftCollapsableText(
                 text = state.data,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface,
-                textAlign = textAlignment,
                 modifier = Modifier.fillMaxWidth()
             )
         }
@@ -165,20 +167,31 @@ fun CardContent(
         }
     }
 
-    Image(
-        painter = painterResource(R.drawable.ic_launcher_background),
-        contentDescription = "QR code",
-        modifier = Modifier
-            .size(160.dp)
-            .offset(y = (-80).dp)
-            .clip(RoundedCornerShape(16.dp))
-            .border(
-                width = 4.dp,
-                color = MaterialTheme.colorScheme.surfaceContainerHighest,
-                shape = RoundedCornerShape(16.dp)
-            )
-            .shadow(8.dp, RoundedCornerShape(16.dp))
-    )
+    val bitmap: Bitmap? = remember(state.data) {
+        if (state.data.isNotBlank()) {
+            generateQRCode(state.data)
+        } else {
+            null
+        }
+    }
+
+    bitmap?.let {
+        Image(
+            bitmap = it.asImageBitmap(),
+            contentDescription = "QR code",
+            modifier = Modifier
+                .size(160.dp)
+                .offset(y = (-80).dp)
+                .clip(RoundedCornerShape(16.dp))
+                .border(
+                    width = 4.dp,
+                    color = MaterialTheme.colorScheme.surfaceContainerHighest,
+                    shape = RoundedCornerShape(16.dp)
+                )
+                .shadow(8.dp, RoundedCornerShape(16.dp))
+        )
+    }
+
 }
 
 @Preview
